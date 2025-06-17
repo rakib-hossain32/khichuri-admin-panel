@@ -1,0 +1,52 @@
+{
+  "orders": [
+    {
+      "id": "ord12345678",
+      "customerName": "হাসান আহমেদ",
+      "items": [
+        { "name": "খিচুড়ি", "qty": 2 },
+        { "name": "ডিম ভাজি", "qty": 1 }
+      ],
+      "total": 250,
+      "status": "পেন্ডিং",
+      "timestamp": "2025-06-12T10:00:00Z"
+    },
+    {
+      "id": "ord98765432",
+      "customerName": "নাবিলা রহমান",
+      "items": [
+        { "name": "চিকেন বিরিয়ানি", "qty": 1 }
+      ],
+      "total": 180,
+      "status": "সম্পন্ন",
+      "timestamp": "2025-06-11T15:30:00Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod001",
+      "name": "খিচুড়ি (বড়)",
+      "description": "সুস্বাদু দেশি খিচুড়ি, মশলাদার এবং গরম।",
+      "price": 150,
+      "image": "https://placehold.co/100x100/ADD8E6/000000?text=Khichuri",
+      "discount": 10
+    },
+    {
+      "id": "prod002",
+      "name": "চিকেন বিরিয়ানি",
+      "description": "বিশেষ মশলায় তৈরি মজাদার চিকেন বিরিয়ানি।",
+      "price": 220,
+      "image": "https://placehold.co/100x100/FFDAB9/000000?text=Biryani",
+      "discount": 5
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg001",
+      "name": "সালাউদ্দিন",
+      "email": "sal@example.com",
+      "message": "আপনাদের খাবারের মান খুব ভালো।",
+      "timestamp": "2025-06-10T09:15:00Z"
+    }
+  ]
+}
