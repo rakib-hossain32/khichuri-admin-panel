@@ -20,7 +20,7 @@ ChartJS.register(
 );
 
 // Backend API এর বেস URL
-const API_BASE_URL = ' https://khichuri-backend-api.onrender.com  /api';
+const API_BASE_URL = 'https://khichuri-backend-api.onrender.com/api';
 
 // অ্যাডমিন ক্রেডেনশিয়ালস
 const ADMIN_USERNAME = 'admin';
