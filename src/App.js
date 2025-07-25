@@ -51,6 +51,8 @@ const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState([]);
+    const [newOrderCount, setNewOrderCount] = useState(0);
+    const [showNotifications, setShowNotifications] = useState(false);
     const [products, setProducts] = useState([]);
     const [messages, setMessages] = useState([]);
     const [notification, setNotification] = useState('');
@@ -105,7 +107,60 @@ const App = () => {
         error: 'bg-red-600',
     };
 
-    const fetchOrders = useCallback(() => fetchData(`${API_BASE_URL}/orders`, setOrders, "অর্ডার লোড করতে সমস্যা হয়েছে।"), [fetchData]);
+    const fetchOrders = useCallback(() => 
+        fetchData(`${API_BASE_URL}/orders`, (newOrders) => {
+            console.log('All orders data:', JSON.parse(JSON.stringify(newOrders)));
+            
+            setOrders(prevOrders => {
+                if (!prevOrders || prevOrders.length === 0) {
+                    return newOrders;
+                }
+                
+                // Find new orders
+                const prevOrderIds = new Set(prevOrders.map(order => order._id));
+                const addedOrders = newOrders.filter(order => !prevOrderIds.has(order._id));
+                
+                // If there are new orders
+                if (addedOrders.length > 0) {
+                    // Update new order count
+                    setNewOrderCount(prev => prev + addedOrders.length);
+                    
+                    // Show desktop notification if browser supports it
+                    if (Notification.permission === 'granted') {
+                        addedOrders.forEach(order => {
+                            const customerName = order.customerName || order.name || 'নতুন গ্রাহক';
+                            new Notification('নতুন অর্ডার!', {
+                                body: `${customerName} - ${order.phone || ''}`,
+                                icon: '/logo192.png', // Make sure you have this in your public folder
+                                vibrate: [200, 100, 200]
+                            });
+                        });
+                    }
+                    
+                    // Show in-app notification
+                    if (addedOrders.length === 1) {
+                        const customerName = addedOrders[0].customerName || 
+                                          addedOrders[0].name || 
+                                          'নতুন গ্রাহক';
+                        showNotificationMessage(`নতুন অর্ডার: ${customerName}`, 'success');
+                    } else {
+                        showNotificationMessage(`${addedOrders.length} টি নতুন অর্ডার এসেছে`, 'success');
+                    }
+                    
+                    // Play notification sound
+                    try {
+                        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+                        audio.play().catch(e => console.log('Audio play failed:', e));
+                    } catch (e) {
+                        console.error('Error playing sound:', e);
+                    }
+                }
+                
+                return newOrders;
+            });
+            
+        }, "অর্ডার লোড করতে সমস্যা হয়েছে।"), 
+    [fetchData, showNotificationMessage]);
     const fetchProducts = useCallback(() => fetchData(`${API_BASE_URL}/products`, setProducts, "প্রোডাক্ট লোড করতে সমস্যা হয়েছে।"), [fetchData]);
     const fetchMessages = useCallback(() => fetchData(`${API_BASE_URL}/messages`, setMessages, "মেসেজ লোড করতে সমস্যা হয়েছে।"), [fetchData]);
 
@@ -333,21 +388,115 @@ const App = () => {
             <div className="container mx-auto flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-white">খিচুড়ি ঘর - অ্যাডমিন প্যানেল</h1>
                 <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <button
-                            onClick={() => showNotificationMessage(`আপনার ${orders.filter(o => o.status === 'পেন্ডিং').length}টি পেন্ডিং অর্ডার আছে।`, 'info')}
-                            className="p-2 rounded-full bg-green-500 text-white shadow-md hover:bg-green-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-300"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                        </button>
-                        {orders.filter(o => o.status === 'পেন্ডিং').length > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce">
-                                {orders.filter(o => o.status === 'পেন্ডিং').length}
-                            </span>
-                        )}
-                    </div>
+                        <div className="relative">
+                            <div className="relative">
+                                <button
+                                    onClick={() => {
+                                        setShowNotifications(!showNotifications);
+                                        setNewOrderCount(0); // Reset counter when clicking the bell
+                                    }}
+                                    className="p-2 text-white hover:bg-green-600 rounded-full transition-colors duration-200 relative"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                    
+                                    {/* Notification Badge - Shows count of pending orders */}
+                                    {(() => {
+                                        const pendingOrders = orders.filter(o => o.status === 'পেন্ডিং' || o.status === 'pending');
+                                        console.log('Pending orders:', pendingOrders);
+                                        return pendingOrders.length > 0 ? (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full">
+                                                {pendingOrders.length}
+                                            </span>
+                                        ) : null;
+                                    })()}
+                                </button>
+                            </div>
+                            
+                            {/* Notification Dropdown */}
+                            {showNotifications && (
+                                <div className="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg overflow-hidden z-50">
+                                    <div className="p-4 border-b border-gray-200 bg-green-600">
+                                        <h3 className="text-lg font-medium text-white">নতুন অর্ডার সমূহ</h3>
+                                    </div>
+                                    <div className="max-h-96 overflow-y-auto">
+                                        {(() => {
+                                            if (orders.length === 0) {
+                                                return (
+                                                    <div className="p-4 text-center text-gray-500">
+                                                        কোনো নতুন অর্ডার পাওয়া যায়নি
+                                                    </div>
+                                                );
+                                            }
+
+                                            // Sort orders by creation date (newest first) and take first 10
+                                            const sortedOrders = [...orders]
+                                                .sort((a, b) => {
+                                                    const dateA = new Date(a.createdAt || 0);
+                                                    const dateB = new Date(b.createdAt || 0);
+                                                    return dateB - dateA; // Newest first
+                                                })
+                                                .slice(0, 10);
+
+                                            return sortedOrders.map((order, index) => {
+                                                let customerData = {};
+                                                try {
+                                                    customerData = order.customerData ? 
+                                                        (typeof order.customerData === 'string' ? 
+                                                            JSON.parse(order.customerData) : order.customerData) : 
+                                                        {};
+                                                } catch (e) {
+                                                    console.error('Error parsing customer data:', e);
+                                                }
+                                                
+                                                return (
+                                                    <div key={order._id} className="p-4 border-b border-gray-100 hover:bg-gray-50">
+                                                        <div className="flex items-start">
+                                                            <div className="flex-shrink-0 w-8 text-gray-500 font-bold">
+                                                                {index + 1}.
+                                                            </div>
+                                                            <div className="ml-2 flex-1">
+                                                                <p className="text-sm font-medium text-gray-900 flex justify-between">
+                                                                    <span>অর্ডার # {order._id?.substring(0, 6) || 'N/A'}</span>
+                                                                    <span className={`text-xs px-2 py-1 rounded-full ${
+                                                                        order.status === 'pending' || order.status === 'পেন্ডিং' ? 
+                                                                        'bg-yellow-100 text-yellow-800' : 
+                                                                        'bg-green-100 text-green-800'
+                                                                    }`}>
+                                                                        {order.status === 'pending' || order.status === 'পেন্ডিং' ? 'পেন্ডিং' : (order.status || 'N/A')}
+                                                                    </span>
+                                                                </p>
+                                                                <p className="text-sm text-gray-700 mt-1">
+                                                                    {customerData?.name || 'নামবিহীন গ্রাহক'}
+                                                                </p>
+                                                                <p className="text-xs text-gray-500 mt-1">
+                                                                    {customerData?.phone || 'ফোন নং নেই'}
+                                                                </p>
+                                                                <p className="text-xs text-gray-400 mt-1">
+                                                                    {order.createdAt ? new Date(order.createdAt).toLocaleString('bn-BD') : 'তারিখ পাওয়া যায়নি'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            });
+                                        })()}
+                                    </div>
+                                    <div className="bg-gray-50 px-4 py-3 text-center border-t border-gray-200">
+                                        <button 
+                                            onClick={() => {
+                                                setActiveTab('orders');
+                                                setShowNotifications(false);
+                                            }} 
+                                            className="text-sm font-medium text-green-600 hover:text-green-500 px-4 py-1 rounded-md hover:bg-green-50"
+                                        >
+                                            সব অর্ডার দেখুন
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     <button onClick={() => setIsLoggedIn(false)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300">লগ আউট</button>
                 </div>
             </div>
@@ -475,7 +624,7 @@ const App = () => {
         <div className="flex flex-col min-h-screen bg-gray-100">
             <Header />
             <div className="flex flex-1">
-                <aside className="w-64 bg-gray-800 text-white p-4">
+                <aside className="w-64 bg-gray-800 text-white p-4 h-screen sticky top-0 overflow-y-auto">
                     <nav>
                         <ul>
                             <li onClick={() => setActiveTab('orders')} className={`p-4 cursor-pointer rounded ${activeTab === 'orders' ? 'bg-green-500' : 'hover:bg-gray-700'}`}>অর্ডার</li>
@@ -485,15 +634,15 @@ const App = () => {
                         </ul>
                     </nav>
                 </aside>
-                <main className="flex-1 p-0">
+                <main className="flex-1 p-0 overflow-y-auto h-screen pr-4">
                     {activeTab === 'orders' && (
                         <div className="p-8">
                             <h2 className="text-3xl font-bold mb-6">অর্ডার ম্যানেজমেন্ট</h2>
                             {loading && <p>অর্ডার লোড হচ্ছে...</p>}
                             {error && <p className="text-red-500">{error}</p>}
-                            <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+                            <div className="bg-white shadow-md rounded-lg overflow-x-auto overflow-y-auto max-h-[70vh]">
                                 <table className="min-w-full">
-                                    <thead className="bg-gray-200">
+                                    <thead className="bg-gray-200 sticky top-0 z-10">
                                         <tr>
                                             <th className="py-3 px-4 text-left">অর্ডার আইডি</th>
                                             <th className="py-3 px-4 text-left">গ্রাহকের নাম</th>
@@ -510,12 +659,71 @@ const App = () => {
                                         {orders.map(order => (
                                             <tr key={order._id} className="border-b hover:bg-gray-50">
                                                 <td className="py-3 px-4">{order._id.substring(0, 8)}...</td>
-                                                <td className="py-3 px-4">{order.customerName}</td>
-                                                <td className="py-3 px-4">{order.phone}</td>
-                                                <td className="py-3 px-4">{order.address}</td>
-                                                <td className="py-3 px-4">{order.items.map(item => `${item.name} (x${item.qty})`).join(', ')}</td>
+                                                <td className="py-3 px-4 font-medium">
+                                                    {/* Try to get name from various possible locations */}
+                                                    {(() => {
+                                                        // Check direct fields first
+                                                        if (order.customerName) return order.customerName;
+                                                        if (order.name) return order.name;
+                                                        
+                                                        // Check customer/user objects
+                                                        if (order.customer?.name) return order.customer.name;
+                                                        if (order.user?.name) return order.user.name;
+                                                        
+                                                        // Check customerData (could be string or object)
+                                                        try {
+                                                            if (order.customerData) {
+                                                                const customerData = typeof order.customerData === 'string' 
+                                                                    ? JSON.parse(order.customerData) 
+                                                                    : order.customerData;
+                                                                if (customerData.name) return customerData.name;
+                                                            }
+                                                        } catch (e) {
+                                                            console.error('Error parsing customerData:', e);
+                                                        }
+                                                        
+                                                        // If we have an email but no name, use the email
+                                                        if (order.email) return order.email.split('@')[0];
+                                                        
+                                                        // Fallback
+                                                        return 'নাম পাওয়া যায়নি';
+                                                    })()}
+                                                </td>
+                                                <td className="py-3 px-4">
+                                                    {order.phone || 
+                                                     order.customer?.phone || 
+                                                     order.user?.phone ||
+                                                     (order.customerData ? (
+                                                        typeof order.customerData === 'string' ? 
+                                                            JSON.parse(order.customerData).phone : 
+                                                            order.customerData.phone
+                                                     ) : 'নম্বর নেই')}
+                                                </td>
+                                                <td className="py-3 px-4">
+                                                    {order.address ||
+                                                     (order.customerData ? (
+                                                        typeof order.customerData === 'string' ? 
+                                                            JSON.parse(order.customerData).address : 
+                                                            order.customerData.address
+                                                     ) : 'ঠিকানা নেই')}
+                                                </td>
+                                                <td className="py-3 px-4">
+                                                    <div className="space-y-1">
+                                                        {order.items.map((item, idx) => (
+                                                            <div key={idx} className="flex justify-between">
+                                                                <span>{item.name || item.productName || 'আইটেম ' + (idx + 1)}</span>
+                                                                <span className="font-medium">x{item.quantity || item.qty || 1}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </td>
                                                 <td className="py-3 px-4">৳{order.total}</td>
-                                                <td className="py-3 px-4">{order.paymentMethod || 'N/A'}</td>
+                                                <td className="py-3 px-4">
+                                                    {order.paymentMethod === 'cod' ? 'ক্যাশ অন ডেলিভারি' : 
+                                                     order.paymentMethod === 'bkash' ? 'বিকাশ' : 
+                                                     order.paymentMethod === 'nagad' ? 'নগদ' : 
+                                                     order.paymentMethod || 'N/A'}
+                                                </td>
                                                 <td className="py-3 px-4">
                                                     <select value={order.status} onChange={(e) => handleOrderStatusChange(order._id, e.target.value)} className="p-2 border rounded">
                                                         <option value="পেন্ডিং">পেন্ডিং</option>
@@ -539,9 +747,9 @@ const App = () => {
                                 <h2 className="text-3xl font-bold">প্রোডাক্ট ম্যানেজমেন্ট</h2>
                                 <button onClick={openAddProductModal} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">নতুন প্রোডাক্ট যোগ করুন</button>
                             </div>
-                            <div className="bg-white shadow-md rounded-lg overflow-x-auto">
+                            <div className="bg-white shadow-md rounded-lg overflow-x-auto overflow-y-auto max-h-[70vh]">
                                 <table className="min-w-full">
-                                    <thead className="bg-gray-200">
+                                    <thead className="bg-gray-200 sticky top-0 z-10">
                                         <tr>
                                             <th className="py-3 px-4 text-left">ছবি</th>
                                             <th className="py-3 px-4 text-left">নাম</th>
