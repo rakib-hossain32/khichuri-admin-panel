@@ -51,6 +51,7 @@ const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
     const [products, setProducts] = useState([]);
