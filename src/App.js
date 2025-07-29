@@ -62,7 +62,9 @@ const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState([]);
-    const [newOrderCount, setNewOrderCount] = useState(0);
+    // eslint-disable-next-line no-unused-vars
+const [newOrderCount, setNewOrderCount] = useState(0);
+
     const [showNotifications, setShowNotifications] = useState(false);
     const [products, setProducts] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -395,8 +397,8 @@ const App = () => {
 
     // --- Header কম্পোনেন্ট ---
     const Header = () => (
-        <header className="bg-gradient-to-r from-green-400 to-green-600 p-4 shadow-xl sticky top-0 z-50">
-            <div className="container mx-auto flex justify-between items-center">
+        <header className="sticky top-0 z-50 p-4 shadow-xl bg-gradient-to-r from-green-400 to-green-600">
+            <div className="container flex items-center justify-between mx-auto">
                 <h1 className="text-2xl font-bold text-white">খিচুড়ি ঘর - অ্যাডমিন প্যানেল</h1>
                 <div className="flex items-center gap-4">
                         <div className="relative">
@@ -406,9 +408,9 @@ const App = () => {
                                         setShowNotifications(!showNotifications);
                                         setNewOrderCount(0); // Reset counter when clicking the bell
                                     }}
-                                    className="p-2 text-white hover:bg-green-600 rounded-full transition-colors duration-200 relative"
+                                    className="relative p-2 text-white transition-colors duration-200 rounded-full hover:bg-green-600"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                     </svg>
                                     
@@ -417,7 +419,7 @@ const App = () => {
                                         const pendingOrders = orders.filter(o => o.status === 'পেন্ডিং' || o.status === 'pending');
                                         console.log('Pending orders:', pendingOrders);
                                         return pendingOrders.length > 0 ? (
-                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full">
+                                            <span className="absolute flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
                                                 {pendingOrders.length}
                                             </span>
                                         ) : null;
@@ -427,11 +429,11 @@ const App = () => {
                             
                             {/* Notification Dropdown */}
                             {showNotifications && (
-                                <div className="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg overflow-hidden z-50">
-                                    <div className="p-4 border-b border-gray-200 bg-green-600">
+                                <div className="absolute right-0 z-50 mt-2 overflow-hidden bg-white rounded-md shadow-lg w-96">
+                                    <div className="p-4 bg-green-600 border-b border-gray-200">
                                         <h3 className="text-lg font-medium text-white">নতুন অর্ডার সমূহ</h3>
                                     </div>
-                                    <div className="max-h-96 overflow-y-auto">
+                                    <div className="overflow-y-auto max-h-96">
                                         {(() => {
                                             if (orders.length === 0) {
                                                 return (
@@ -464,11 +466,11 @@ const App = () => {
                                                 return (
                                                     <div key={order._id} className="p-4 border-b border-gray-100 hover:bg-gray-50">
                                                         <div className="flex items-start">
-                                                            <div className="flex-shrink-0 w-8 text-gray-500 font-bold">
+                                                            <div className="flex-shrink-0 w-8 font-bold text-gray-500">
                                                                 {index + 1}.
                                                             </div>
-                                                            <div className="ml-2 flex-1">
-                                                                <p className="text-sm font-medium text-gray-900 flex justify-between">
+                                                            <div className="flex-1 ml-2">
+                                                                <p className="flex justify-between text-sm font-medium text-gray-900">
                                                                     <span>অর্ডার # {order._id?.substring(0, 6) || 'N/A'}</span>
                                                                     <span className={`text-xs px-2 py-1 rounded-full ${
                                                                         order.status === 'pending' || order.status === 'পেন্ডিং' ? 
@@ -478,13 +480,13 @@ const App = () => {
                                                                         {order.status === 'pending' || order.status === 'পেন্ডিং' ? 'পেন্ডিং' : (order.status || 'N/A')}
                                                                     </span>
                                                                 </p>
-                                                                <p className="text-sm text-gray-700 mt-1">
+                                                                <p className="mt-1 text-sm text-gray-700">
                                                                     {customerData?.name || 'নামবিহীন গ্রাহক'}
                                                                 </p>
-                                                                <p className="text-xs text-gray-500 mt-1">
+                                                                <p className="mt-1 text-xs text-gray-500">
                                                                     {customerData?.phone || 'ফোন নং নেই'}
                                                                 </p>
-                                                                <p className="text-xs text-gray-400 mt-1">
+                                                                <p className="mt-1 text-xs text-gray-400">
                                                                     {order.createdAt ? new Date(order.createdAt).toLocaleString('bn-BD') : 'তারিখ পাওয়া যায়নি'}
                                                                 </p>
                                                             </div>
@@ -494,13 +496,13 @@ const App = () => {
                                             });
                                         })()}
                                     </div>
-                                    <div className="bg-gray-50 px-4 py-3 text-center border-t border-gray-200">
+                                    <div className="px-4 py-3 text-center border-t border-gray-200 bg-gray-50">
                                         <button 
                                             onClick={() => {
                                                 setActiveTab('orders');
                                                 setShowNotifications(false);
                                             }} 
-                                            className="text-sm font-medium text-green-600 hover:text-green-500 px-4 py-1 rounded-md hover:bg-green-50"
+                                            className="px-4 py-1 text-sm font-medium text-green-600 rounded-md hover:text-green-500 hover:bg-green-50"
                                         >
                                             সব অর্ডার দেখুন
                                         </button>
@@ -508,7 +510,7 @@ const App = () => {
                                 </div>
                             )}
                         </div>
-                    <button onClick={() => setIsLoggedIn(false)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300">লগ আউট</button>
+                    <button onClick={() => setIsLoggedIn(false)} className="px-4 py-2 font-bold text-white transition duration-300 bg-red-500 rounded hover:bg-red-700">লগ আউট</button>
                 </div>
             </div>
         </header>
@@ -516,7 +518,7 @@ const App = () => {
 
     // --- Footer কম্পোনেন্ট ---
     const Footer = () => (
-        <footer className="bg-gray-800 text-white p-4 text-center">
+        <footer className="p-4 text-center text-white bg-gray-800">
             <p>&copy; {new Date().getFullYear()} খিচুড়ি ঘর। সর্বস্বত্ব সংরক্ষিত।</p>
         </footer>
     );
@@ -551,9 +553,9 @@ const App = () => {
         };
 
         return (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                 <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-                    <h2 className="text-2xl font-bold mb-6">{product ? 'প্রোডাক্ট এডিট করুন' : 'নতুন প্রোডাক্ট যোগ করুন'}</h2>
+                    <h2 className="mb-6 text-2xl font-bold">{product ? 'প্রোডাক্ট এডিট করুন' : 'নতুন প্রোডাক্ট যোগ করুন'}</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label className="block text-gray-700">নাম</label>
@@ -569,7 +571,7 @@ const App = () => {
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">রেসিপি</label>
-                            <textarea name="recipe" value={formData.recipe} onChange={handleChange} className="w-full p-2 border rounded h-32"></textarea>
+                            <textarea name="recipe" value={formData.recipe} onChange={handleChange} className="w-full h-32 p-2 border rounded"></textarea>
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">বিবরণ</label>
@@ -580,8 +582,8 @@ const App = () => {
                             <input type="text" name="image" value={formData.image} onChange={handleChange} className="w-full p-2 border rounded" />
                         </div>
                         <div className="flex justify-end gap-4">
-                            <button type="button" onClick={onClose} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"> বাতিল </button>
-                            <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"> সংরক্ষণ করুন </button>
+                            <button type="button" onClick={onClose} className="px-4 py-2 font-bold text-white bg-gray-500 rounded hover:bg-gray-600"> বাতিল </button>
+                            <button type="submit" className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-600"> সংরক্ষণ করুন </button>
                         </div>
                     </form>
                 </div>
@@ -593,12 +595,12 @@ const App = () => {
     const ConfirmModal = ({ isOpen, message, onConfirm, onCancel }) => {
         if (!isOpen) return null;
         return (
-            <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-                <div className="bg-white p-8 rounded-lg shadow-xl text-center">
-                    <p className="text-lg mb-6">{message}</p>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+                <div className="p-8 text-center bg-white rounded-lg shadow-xl">
+                    <p className="mb-6 text-lg">{message}</p>
                     <div className="flex justify-center gap-4">
-                        <button onClick={onCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded">না</button>
-                        <button onClick={onConfirm} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded">হ্যাঁ</button>
+                        <button onClick={onCancel} className="px-6 py-2 font-bold text-white bg-gray-500 rounded hover:bg-gray-600">না</button>
+                        <button onClick={onConfirm} className="px-6 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-600">হ্যাঁ</button>
                     </div>
                 </div>
             </div>
@@ -607,9 +609,9 @@ const App = () => {
 
     if (!isLoggedIn) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-                    <h2 className="text-2xl font-bold text-center mb-6">অ্যাডমিন লগইন</h2>
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                <div className="w-full max-w-sm p-8 bg-white rounded-lg shadow-md">
+                    <h2 className="mb-6 text-2xl font-bold text-center">অ্যাডমিন লগইন</h2>
                     <form onSubmit={handleLogin}>
                         <div className="mb-4">
                             <label className="block text-gray-700">ব্যবহারকারীর নাম</label>
@@ -619,7 +621,7 @@ const App = () => {
                             <label className="block text-gray-700">পাসওয়ার্ড</label>
                             <input type="password" name="password" className="w-full p-2 border rounded" defaultValue={ADMIN_PASSWORD} />
                         </div>
-                        <button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">লগইন করুন</button>
+                        <button type="submit" className="w-full px-4 py-2 font-bold text-white bg-green-500 rounded hover:bg-green-600">লগইন করুন</button>
                     </form>
                 </div>
                 {showNotification && (
@@ -635,7 +637,7 @@ const App = () => {
         <div className="flex flex-col min-h-screen bg-gray-100">
             <Header />
             <div className="flex flex-1">
-                <aside className="w-64 bg-gray-800 text-white p-4 h-screen sticky top-0 overflow-y-auto">
+                <aside className="sticky top-0 w-64 h-screen p-4 overflow-y-auto text-white bg-gray-800">
                     <nav>
                         <ul>
                             <li onClick={() => setActiveTab('orders')} className={`p-4 cursor-pointer rounded ${activeTab === 'orders' ? 'bg-green-500' : 'hover:bg-gray-700'}`}>অর্ডার</li>
@@ -645,32 +647,32 @@ const App = () => {
                         </ul>
                     </nav>
                 </aside>
-                <main className="flex-1 p-0 overflow-y-auto h-screen pr-4">
+                <main className="flex-1 h-screen p-0 pr-4 overflow-y-auto">
                     {activeTab === 'orders' && (
                         <div className="p-8">
-                            <h2 className="text-3xl font-bold mb-6">অর্ডার ম্যানেজমেন্ট</h2>
+                            <h2 className="mb-6 text-3xl font-bold">অর্ডার ম্যানেজমেন্ট</h2>
                             {loading && <p>অর্ডার লোড হচ্ছে...</p>}
                             {error && <p className="text-red-500">{error}</p>}
                             <div className="bg-white shadow-md rounded-lg overflow-x-auto overflow-y-auto max-h-[70vh]">
                                 <table className="min-w-full">
-                                    <thead className="bg-gray-200 sticky top-0 z-10">
+                                    <thead className="sticky top-0 z-10 bg-gray-200">
                                         <tr>
-                                            <th className="py-3 px-4 text-left">অর্ডার আইডি</th>
-                                            <th className="py-3 px-4 text-left">গ্রাহকের নাম</th>
-                                            <th className="py-3 px-4 text-left">ফোন নম্বর</th>
-                                            <th className="py-3 px-4 text-left">ঠিকানা</th>
-                                            <th className="py-3 px-4 text-left">আইটেম</th>
-                                            <th className="py-3 px-4 text-left">মোট টাকা</th>
-                                            <th className="py-3 px-4 text-left">পেমেন্ট পদ্ধতি</th>
-                                            <th className="py-3 px-4 text-left">স্ট্যাটাস</th>
-                                            <th className="py-3 px-4 text-left">সময়</th>
+                                            <th className="px-4 py-3 text-left">অর্ডার আইডি</th>
+                                            <th className="px-4 py-3 text-left">গ্রাহকের নাম</th>
+                                            <th className="px-4 py-3 text-left">ফোন নম্বর</th>
+                                            <th className="px-4 py-3 text-left">ঠিকানা</th>
+                                            <th className="px-4 py-3 text-left">আইটেম</th>
+                                            <th className="px-4 py-3 text-left">মোট টাকা</th>
+                                            <th className="px-4 py-3 text-left">পেমেন্ট পদ্ধতি</th>
+                                            <th className="px-4 py-3 text-left">স্ট্যাটাস</th>
+                                            <th className="px-4 py-3 text-left">সময়</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {orders.map(order => (
                                             <tr key={order._id} className="border-b hover:bg-gray-50">
-                                                <td className="py-3 px-4">{order._id.substring(0, 8)}...</td>
-                                                <td className="py-3 px-4 font-medium">
+                                                <td className="px-4 py-3">{order._id.substring(0, 8)}...</td>
+                                                <td className="px-4 py-3 font-medium">
                                                     {/* Try to get name from various possible locations */}
                                                     {(() => {
                                                         // Check direct fields first
@@ -700,7 +702,7 @@ const App = () => {
                                                         return 'নাম পাওয়া যায়নি';
                                                     })()}
                                                 </td>
-                                                <td className="py-3 px-4">
+                                                <td className="px-4 py-3">
                                                     {order.phone || 
                                                      order.customer?.phone || 
                                                      order.user?.phone ||
@@ -710,7 +712,7 @@ const App = () => {
                                                             order.customerData.phone
                                                      ) : 'নম্বর নেই')}
                                                 </td>
-                                                <td className="py-3 px-4">
+                                                <td className="px-4 py-3">
                                                     {order.address ||
                                                      (order.customerData ? (
                                                         typeof order.customerData === 'string' ? 
@@ -718,7 +720,7 @@ const App = () => {
                                                             order.customerData.address
                                                      ) : 'ঠিকানা নেই')}
                                                 </td>
-                                                <td className="py-3 px-4">
+                                                <td className="px-4 py-3">
                                                     <div className="space-y-1">
                                                         {order.items.map((item, idx) => (
                                                             <div key={idx} className="flex justify-between">
@@ -728,14 +730,14 @@ const App = () => {
                                                         ))}
                                                     </div>
                                                 </td>
-                                                <td className="py-3 px-4">৳{order.total}</td>
-                                                <td className="py-3 px-4">
+                                                <td className="px-4 py-3">৳{order.total}</td>
+                                                <td className="px-4 py-3">
                                                     {order.paymentMethod === 'cod' ? 'ক্যাশ অন ডেলিভারি' : 
                                                      order.paymentMethod === 'bkash' ? 'বিকাশ' : 
                                                      order.paymentMethod === 'nagad' ? 'নগদ' : 
                                                      order.paymentMethod || 'N/A'}
                                                 </td>
-                                                <td className="py-3 px-4">
+                                                <td className="px-4 py-3">
                                                     <select value={order.status} onChange={(e) => handleOrderStatusChange(order._id, e.target.value)} className="p-2 border rounded">
                                                         <option value="পেন্ডিং">পেন্ডিং</option>
                                                         <option value="প্রস্তুত হচ্ছে">প্রস্তুত হচ্ছে</option>
@@ -744,7 +746,7 @@ const App = () => {
                                                         <option value="বাতিল">বাতিল</option>
                                                     </select>
                                                 </td>
-                                                <td className="py-3 px-4">{formatTimestamp(order.createdAt)}</td>
+                                                <td className="px-4 py-3">{formatTimestamp(order.createdAt)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -754,35 +756,35 @@ const App = () => {
                     )}
                     {activeTab === 'products' && (
                         <div className="p-8">
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-3xl font-bold">প্রোডাক্ট ম্যানেজমেন্ট</h2>
-                                <button onClick={openAddProductModal} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">নতুন প্রোডাক্ট যোগ করুন</button>
+                                <button onClick={openAddProductModal} className="px-4 py-2 font-bold text-white bg-green-500 rounded hover:bg-green-600">নতুন প্রোডাক্ট যোগ করুন</button>
                             </div>
                             <div className="bg-white shadow-md rounded-lg overflow-x-auto overflow-y-auto max-h-[70vh]">
                                 <table className="min-w-full">
-                                    <thead className="bg-gray-200 sticky top-0 z-10">
+                                    <thead className="sticky top-0 z-10 bg-gray-200">
                                         <tr>
-                                            <th className="py-3 px-4 text-left">ছবি</th>
-                                            <th className="py-3 px-4 text-left">নাম</th>
-                                            <th className="py-3 px-4 text-left">দাম</th>
-                                            <th className="py-3 px-4 text-left">ডিসকাউন্ট</th>
-                                            <th className="py-3 px-4 text-left">বিবরণ</th>
-                                            <th className="py-3 px-4 text-left">অ্যাকশন</th>
+                                            <th className="px-4 py-3 text-left">ছবি</th>
+                                            <th className="px-4 py-3 text-left">নাম</th>
+                                            <th className="px-4 py-3 text-left">দাম</th>
+                                            <th className="px-4 py-3 text-left">ডিসকাউন্ট</th>
+                                            <th className="px-4 py-3 text-left">বিবরণ</th>
+                                            <th className="px-4 py-3 text-left">অ্যাকশন</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {products.map(product => (
                                             <tr key={product._id} className="border-b hover:bg-gray-50">
-                                                <td className="py-3 px-4">
-                                                    <img src={product.image} alt={product.name} className="w-16 h-16 rounded-md object-cover" onError={(e) => e.target.src = 'https://placehold.co/100x100/CCCCCC/000000?text=No+Image'} />
+                                                <td className="px-4 py-3">
+                                                    <img src={product.image} alt={product.name} className="object-cover w-16 h-16 rounded-md" onError={(e) => e.target.src = 'https://placehold.co/100x100/CCCCCC/000000?text=No+Image'} />
                                                 </td>
-                                                <td className="py-3 px-4">{product.name}</td>
-                                                <td className="py-3 px-4">৳{product.price}</td>
-                                                <td className="py-3 px-4">{product.discount || 0}%</td>
-                                                <td className="py-3 px-4 max-w-xs truncate" title={product.description}>{product.description}</td>
-                                                <td className="py-3 px-4">
-                                                    <button onClick={() => openEditProductModal(product)} className="bg-blue-500 text-white py-1 px-3 rounded mr-2">এডিট</button>
-                                                    <button onClick={() => handleDeleteProduct(product._id)} className="bg-red-500 text-white py-1 px-3 rounded">ডিলিট</button>
+                                                <td className="px-4 py-3">{product.name}</td>
+                                                <td className="px-4 py-3">৳{product.price}</td>
+                                                <td className="px-4 py-3">{product.discount || 0}%</td>
+                                                <td className="max-w-xs px-4 py-3 truncate" title={product.description}>{product.description}</td>
+                                                <td className="px-4 py-3">
+                                                    <button onClick={() => openEditProductModal(product)} className="px-3 py-1 mr-2 text-white bg-blue-500 rounded">এডিট</button>
+                                                    <button onClick={() => handleDeleteProduct(product._id)} className="px-3 py-1 text-white bg-red-500 rounded">ডিলিট</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -793,33 +795,33 @@ const App = () => {
                     )}
                     {/* --- রিপোর্ট ট্যাব --- */}
                     {activeTab === 'reports' && (
-                        <div className="p-6 md:p-8 bg-gray-50 min-h-full">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-2">রিপোর্ট ড্যাশবোর্ড</h2>
-                            <p className="text-gray-600 mb-8">আপনার ব্যবসার পারফরম্যান্সের একটি ওভারভিউ দেখুন।</p>
+                        <div className="min-h-full p-6 md:p-8 bg-gray-50">
+                            <h2 className="mb-2 text-3xl font-extrabold text-gray-800 md:text-4xl">রিপোর্ট ড্যাশবোর্ড</h2>
+                            <p className="mb-8 text-gray-600">আপনার ব্যবসার পারফরম্যান্সের একটি ওভারভিউ দেখুন।</p>
                             {/* Summary Cards */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                                <div className="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                                    <h3 className="text-lg font-semibold mb-2">মোট অর্ডার</h3>
+                            <div className="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
+                                <div className="p-6 text-white transition-transform duration-300 transform shadow-lg bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl hover:scale-105">
+                                    <h3 className="mb-2 text-lg font-semibold">মোট অর্ডার</h3>
                                     <p className="text-4xl font-bold">{totalOrders}</p>
                                 </div>
-                                <div className="bg-gradient-to-br from-green-400 to-green-600 text-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                                    <h3 className="text-lg font-semibold mb-2">মোট বিক্রি</h3>
+                                <div className="p-6 text-white transition-transform duration-300 transform shadow-lg bg-gradient-to-br from-green-400 to-green-600 rounded-xl hover:scale-105">
+                                    <h3 className="mb-2 text-lg font-semibold">মোট বিক্রি</h3>
                                     <p className="text-4xl font-bold">৳{totalSales.toLocaleString('bn-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                 </div>
-                                <div className="bg-gradient-to-br from-purple-400 to-purple-600 text-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                                    <h3 className="text-lg font-semibold mb-2">মোট প্রোডাক্ট</h3>
+                                <div className="p-6 text-white transition-transform duration-300 transform shadow-lg bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl hover:scale-105">
+                                    <h3 className="mb-2 text-lg font-semibold">মোট প্রোডাক্ট</h3>
                                     <p className="text-4xl font-bold">{totalProducts}</p>
                                 </div>
-                                <div className="bg-gradient-to-br from-red-400 to-red-600 text-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-                                    <h3 className="text-lg font-semibold mb-2">মোট মেসেজ</h3>
+                                <div className="p-6 text-white transition-transform duration-300 transform shadow-lg bg-gradient-to-br from-red-400 to-red-600 rounded-xl hover:scale-105">
+                                    <h3 className="mb-2 text-lg font-semibold">মোট মেসেজ</h3>
                                     <p className="text-4xl font-bold">{totalMessages}</p>
                                 </div>
                             </div>
                             {/* Sales Chart */}
-                            <div className="bg-white p-4 md:p-6 rounded-xl shadow-lg h-96">
+                            <div className="p-4 bg-white shadow-lg md:p-6 rounded-xl h-96">
                                 {loading ? (
                                     <div className="flex items-center justify-center h-full">
-                                        <p className="text-gray-500 text-lg">চার্ট লোড হচ্ছে...</p>
+                                        <p className="text-lg text-gray-500">চার্ট লোড হচ্ছে...</p>
                                     </div>
                                 ) : (
                                     <Bar options={chartOptions} data={chartData} />
@@ -829,8 +831,8 @@ const App = () => {
                     )}
                     {activeTab === 'messages' && (
                         <div className="p-8">
-                            <h2 className="text-3xl font-bold mb-6">মেসেজ</h2>
-                            <div className="bg-white shadow-md rounded-lg">
+                            <h2 className="mb-6 text-3xl font-bold">মেসেজ</h2>
+                            <div className="bg-white rounded-lg shadow-md">
                                 <ul>
                                     {messages.map(msg => (
                                         <li key={msg._id} className="p-4 border-b">
