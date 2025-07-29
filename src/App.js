@@ -27,10 +27,21 @@ const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'password123';
 
 // টাইমস্ট্যাম্প ফরম্যাট করার জন্য হেল্পার ফাংশন
-const formatTimestamp = (isoString) => {
-    if (!isoString) return 'N/A';
+const formatTimestamp = (dateInput) => {
+    if (!dateInput) return 'N/A';
     try {
-        const date = new Date(isoString);
+        let date;
+        
+        // If it's a MongoDB ObjectId string, extract timestamp
+        if (typeof dateInput === 'string' && dateInput.length === 24 && /^[0-9a-fA-F]{24}$/.test(dateInput)) {
+            // Extract timestamp from ObjectId (first 4 bytes represent timestamp)
+            const timestamp = parseInt(dateInput.substring(0, 8), 16) * 1000;
+            date = new Date(timestamp);
+        } else {
+            // Otherwise treat as regular date
+            date = new Date(dateInput);
+        }
+        
         return date.toLocaleString('bn-BD', {
             year: 'numeric',
             month: 'short',
@@ -41,7 +52,7 @@ const formatTimestamp = (isoString) => {
             hour12: true
         });
     } catch (e) {
-        console.error("Invalid date string:", isoString, e);
+        console.error("Invalid date input:", dateInput, e);
         return 'Invalid Date';
     }
 };
@@ -51,7 +62,6 @@ const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeTab, setActiveTab] = useState('orders');
     const [orders, setOrders] = useState([]);
-    // eslint-disable-next-line no-unused-vars
     const [newOrderCount, setNewOrderCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
     const [products, setProducts] = useState([]);
@@ -827,7 +837,9 @@ const App = () => {
                                             <p><strong>নাম:</strong> {msg.name}</p>
                                             <p><strong>ইমেইল:</strong> {msg.email}</p>
                                             <p><strong>মেসেজ:</strong> {msg.message}</p>
-                                            <p className="text-sm text-gray-500">{formatTimestamp(msg.createdAt)}</p>
+                                            <p className="text-sm text-gray-500">
+                                                <strong>সময়:</strong> {formatTimestamp(msg.createdAt || msg._id)}
+                                            </p>
                                         </li>
                                     ))}
                                 </ul>
